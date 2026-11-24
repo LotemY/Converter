@@ -71,6 +71,19 @@ h2{font-size:15px;margin:24px 4px 8px;color:var(--muted);font-weight:600}
   .grid h2{margin-top:6px}
   .side{position:sticky;top:16px}
 }
+/* Mouse/trackpad screens can't easily scroll sideways: wrap instead */
+@media (hover:hover) and (pointer:fine){
+  .chips{flex-wrap:wrap;overflow:visible;margin:0;padding:2px 0 14px;-webkit-mask-image:none;mask-image:none}
+}
+/* Wide screens: categories become a sidebar */
+@media (min-width:980px){
+  .wrap{max-width:1240px}
+  .layout{display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px;align-items:start}
+  .chips{flex-direction:column;flex-wrap:nowrap;gap:4px;padding:0;position:sticky;top:16px}
+  .chip{text-align:left;background:transparent;border-radius:12px;padding:10px 14px}
+  .chip:hover{background:var(--chip)}
+  .chip[aria-pressed=true]{background:var(--brand)}
+}
 .foot{font-size:12px;color:var(--muted);text-align:center;margin-top:24px}
 .foot a{color:inherit}
 .hide{display:none!important}
@@ -80,6 +93,7 @@ h2{font-size:15px;margin:24px 4px 8px;color:var(--muted);font-weight:600}
 <div class="wrap">
   <header><h1>Converter</h1></header>
 
+  <div class="layout">
   <nav class="chips" id="cats" aria-label="Categories"></nav>
 
   <div class="grid">
@@ -105,6 +119,7 @@ h2{font-size:15px;margin:24px 4px 8px;color:var(--muted);font-weight:600}
   <div>
   <h2 id="alltitle">All units</h2>
   <section class="card" style="padding:4px 12px"><ul class="list" id="all"></ul></section>
+  </div>
   </div>
   </div>
 
