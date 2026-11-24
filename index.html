@@ -62,6 +62,15 @@ h2{font-size:15px;margin:24px 4px 8px;color:var(--muted);font-weight:600}
 .list li:last-child{border-bottom:0}
 .list .v{font-variant-numeric:tabular-nums;text-align:right;font-weight:600;overflow-wrap:anywhere}
 .list .n{color:var(--muted)}
+.chips{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+@media (min-width:700px){
+  .wrap{max-width:1040px;padding:28px 28px 40px}
+  h1{font-size:32px}
+  .chips{flex-wrap:wrap;overflow:visible;margin:0;padding:2px 0 14px;-webkit-mask-image:none;mask-image:none}
+  .grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:start}
+  .grid h2{margin-top:6px}
+  .side{position:sticky;top:16px}
+}
 .foot{font-size:12px;color:var(--muted);text-align:center;margin-top:24px}
 .foot a{color:inherit}
 .hide{display:none!important}
@@ -73,7 +82,8 @@ h2{font-size:15px;margin:24px 4px 8px;color:var(--muted);font-weight:600}
 
   <nav class="chips" id="cats" aria-label="Categories"></nav>
 
-  <section class="card">
+  <div class="grid">
+  <section class="card side">
     <div class="row">
       <label class="lab" for="amt">From</label>
       <input id="amt" class="amount" inputmode="decimal" autocomplete="off" value="1">
@@ -92,8 +102,11 @@ h2{font-size:15px;margin:24px 4px 8px;color:var(--muted);font-weight:600}
     </div>
   </section>
 
+  <div>
   <h2 id="alltitle">All units</h2>
   <section class="card" style="padding:4px 12px"><ul class="list" id="all"></ul></section>
+  </div>
+  </div>
 
   <p class="foot" id="foot"></p>
 </div>
@@ -211,7 +224,7 @@ function fmt(n, isCur){
   if(!isFinite(n)) return '—';
   const a = Math.abs(n);
   if(a!==0 && (a>=1e15 || a<1e-6)) return n.toExponential(4).replace('e+','e');
-  if(isCur) return n.toLocaleString('en-US',{maximumFractionDigits: a>=1 ? 2 : 6, minimumFractionDigits: a>=1 ? 2 : 0});
+  if(isCur) return n.toLocaleString('en-US',{maximumFractionDigits: a>=1 ? 2 : 4, minimumFractionDigits: 2});
   return n.toLocaleString('en-US',{maximumSignificantDigits:7});
 }
 function parseAmount(s){
@@ -226,7 +239,15 @@ function ago(ms){
   const h = Math.round(m/60); if(h<24) return h+' h ago';
   const d = Math.round(h/24); return d+(d===1?' day ago':' days ago');
 }
-const fmtDate = ms => new Date(ms).toLocaleString(undefined,{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+// 24-hour time in the phone's own time zone, e.g. "Tue 24 Nov, 02:02 (GMT+2)"
+const fmtDate = ms => {
+  const d = new Date(ms);
+  const day = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}).replace(',','');
+  const time = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+  let zone = '';
+  try{ zone = d.toLocaleTimeString('en-GB',{timeZoneName:'short'}).split(' ').pop(); }catch(e){}
+  return `${day}, ${time}` + (zone ? ` (${zone})` : '');
+};
 
 // ---------- State ----------
 const saved = store.get('state') || {};
